@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Stuffing List Calculator</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    input, button { margin: 5px; }
+    table, th, td { border: 1px solid black; border-collapse: collapse; padding: 5px; }
+  </style>
+</head>
+<body>
+  <h1>Stuffing List Calculator</h1>
+  <p>Masukkan model dan quantity (contoh: F1909/21.5 - Qty: 100)</p>
+  
+  <textarea id="input" rows="10" cols="50" placeholder="F1909/21.5, 100&#10;FG417/32, 50"></textarea><br>
+  <button onclick="calculate()">Hitung CUFT</button>
+
+  <h2>Hasil:</h2>
+  <div id="result"></div>
+
+  <script>
+    const cuftDict = {
+      "F1909/21.5": 2.17, "F1909/22": 2.38, "F1909/24": 3.3,
+      "F1909/25": 3.79, "F1909/28": 5.5, "F1909/30": 5.78,
+      "F1909/32": 5.8, "F1909/29": 4.95,
+      "FG417/32": 5.75, "FG417/20": 2.08, "FG417/29": 4.71,
+      "FR893/21": 2.15, "FR893/22": 2.37
+      // tambahkan model lain sesuai kebutuhan
+    };
+
+    function normalize(str) {
+      return str.replace(/['"`]/g, "").trim().toUpperCase().replace(/-\d+/, "");
+    }
+
+    function calculate() {
+      let input = document.getElementById("input").value.trim();
+      let lines = input.split("\n");
+      let html = "<table><tr><th>Model</th><th>Qty</th><th>CUFT</th><th>Total CUFT</th></tr>";
+      let totalCUFT = 0;
+
+      lines.forEach(line => {
+        let parts = line.split(",");
+        if (parts.length == 2) {
+          let model = normalize(parts[0]);
+          let qty = parseInt(parts[1]);
+          let cuft = cuftDict[model];
+          if (cuft) {
+            let total = qty * cuft;
+            totalCUFT += total;
+            html += `<tr><td>${model}</td><td>${qty}</td><td>${cuft}</td><td>${total.toFixed(2)}</td></tr>`;
+          } else {
+            html += `<tr><td>${model}</td><td>${qty}</td><td colspan="2">❌ Tidak ditemukan</td></tr>`;
+          }
+        }
+      });
+
+      html += `<tr><th colspan="3">Total</th><th>${totalCUFT.toFixed(2)} CUFT</th></tr></table>`;
+      document.getElementById("result").innerHTML = html;
+    }
+  </script>
+</body>
+</html>
