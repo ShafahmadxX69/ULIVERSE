@@ -1,47 +1,40 @@
 import React, { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 
-export default function InventoryCheck() {
+export default function InventoryChecker() {
   const [invoice, setInvoice] = useState("");
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState("");
 
   const handleGenerate = async () => {
     if (!invoice.trim()) return;
-    // Simulasikan hasil dari API (nanti bisa diganti koneksi ke Google Apps Script endpoint)
-    setResult(
-      `TUMI📦 ${invoice}
-OPE-25010003 FL688-1 139 20" sebanyak 200 ❌ Masih kurang (5)
-OPE-25010003 FL688-1 139 21" sebanyak 250 ❌ Masih kurang (63)
-OPE-25010003 FL688 T20 21" sebanyak 250 ❌ Masih kurang (250)
-OPE-25010003 FL688-1 139 29" sebanyak 100 ❌ Masih kurang (1)
-OPE-25010003 FL688-1 139 29.5" sebanyak 150 ❌ Masih kurang (5)
-OPE-25020002 FL688-1 139 20" sebanyak 200 ❌ Masih kurang (200)
-OPE-25020002 FL688 U05 20" sebanyak 300 ❌ Masih kurang (240)
-OPE-25020002 FL688-1 139 21" sebanyak 200 ❌ Masih kurang (200)
-OPE-25020002 FL688-1 139 24" sebanyak 100 ❌ Masih kurang (100)
-OPE-25020002 FL688 T20 24" sebanyak 100 ❌ Masih kurang (100)
-OPE-25020002 FL688-1 139 29" sebanyak 200 ❌ Masih kurang (200)
-
-📊 Total ${invoice}: 2050
-📞 Jika ada salah, hubungi Emilio ya!`
-    );
+    try {
+      const response = await fetch("/api/check-invoice?invoice=" + encodeURIComponent(invoice));
+      const data = await response.text();
+      setResult(data);
+    } catch (error) {
+      setResult("❌ Error fetching data");
+    }
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
-      <h1 className="text-4xl font-bold mb-6 text-center">Welcome to ULIVERSE</h1>
-      <p className="text-lg mb-4">What do you want?</p>
-      <div className="flex w-full max-w-md gap-2">
-        <Input
-          placeholder="Enter Invoice Number (e.g. INV-E2500174)"
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-100">
+      <h1 className="text-3xl font-bold mb-6 text-center">Welcome to ULIVERSE. What do you want?</h1>
+      <div className="flex w-full max-w-xl">
+        <input
+          type="text"
+          className="flex-grow border border-gray-300 rounded-l-lg px-4 py-2 focus:outline-none"
+          placeholder="Enter INV number..."
           value={invoice}
           onChange={(e) => setInvoice(e.target.value)}
         />
-        <Button onClick={handleGenerate}>Generate</Button>
+        <button
+          onClick={handleGenerate}
+          className="bg-blue-600 text-white px-6 py-2 rounded-r-lg hover:bg-blue-700"
+        >
+          Generate
+        </button>
       </div>
       {result && (
-        <pre className="mt-6 bg-white p-4 rounded shadow w-full max-w-3xl whitespace-pre-wrap">
+        <pre className="mt-6 whitespace-pre-wrap bg-white p-4 rounded-lg shadow-md w-full max-w-3xl">
           {result}
         </pre>
       )}
