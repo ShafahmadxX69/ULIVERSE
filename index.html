@@ -1,43 +1,39 @@
-import React, { useState } from "react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Stuffing List Lookup</title>
+  <style>
+    body { font-family: Arial; background: #f9f9f9; padding: 30px; }
+    input, button { padding: 10px; margin-right: 10px; font-size: 16px; }
+    #result { background: #fff; padding: 20px; margin-top: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body>
+  <h1>🔍 Cari Invoice Stuffing List</h1>
+  <input type="text" id="invoice" placeholder="Masukkan kode invoice (e.g. INV-E2500174)">
+  <button onclick="searchInvoice()">Search</button>
 
-export default function InventoryChecker() {
-  const [invoice, setInvoice] = useState("");
-  const [result, setResult] = useState("");
+  <div id="result"></div>
 
-  const handleGenerate = async () => {
-    if (!invoice.trim()) return;
-    try {
-      const response = await fetch("/api/check-invoice?invoice=" + encodeURIComponent(invoice));
-      const data = await response.text();
-      setResult(data);
-    } catch (error) {
-      setResult("❌ Error fetching data");
+  <script>
+    async function searchInvoice() {
+      const invoice = document.getElementById("invoice").value.trim();
+      if (!invoice) return alert("Masukkan invoice terlebih dahulu!");
+
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = "⏳ Mencari...";
+
+      try {
+        const url = `https://script.google.com/macros/s/AKfycbyFOQv0bb0Ps7T-xV5whmkHEhXNMS6tRAT6FPePslFiE1B1oIkt7kMKFHYryA2l-2c/exec?inv=${invoice}`;
+        const response = await fetch(url);
+        const data = await response.text();
+        resultDiv.innerHTML = data;
+      } catch (err) {
+        resultDiv.innerHTML = "❌ Gagal mengambil data.";
+        console.error(err);
+      }
     }
-  };
-
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-100">
-      <h1 className="text-3xl font-bold mb-6 text-center">Welcome to ULIVERSE. What do you want?</h1>
-      <div className="flex w-full max-w-xl">
-        <input
-          type="text"
-          className="flex-grow border border-gray-300 rounded-l-lg px-4 py-2 focus:outline-none"
-          placeholder="Enter INV number..."
-          value={invoice}
-          onChange={(e) => setInvoice(e.target.value)}
-        />
-        <button
-          onClick={handleGenerate}
-          className="bg-blue-600 text-white px-6 py-2 rounded-r-lg hover:bg-blue-700"
-        >
-          Generate
-        </button>
-      </div>
-      {result && (
-        <pre className="mt-6 whitespace-pre-wrap bg-white p-4 rounded-lg shadow-md w-full max-w-3xl">
-          {result}
-        </pre>
-      )}
-    </div>
-  );
-}
+  </script>
+</body>
+</html>
